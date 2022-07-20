@@ -21,7 +21,7 @@ package com.streamxhub.streamx.common.util
 import org.apache.flink.api.common.state.{ListState, ListStateDescriptor}
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.runtime.state.FunctionInitializationContext
-
+import org.apache.commons.lang3.StringUtils
 import java.io.File
 
 
@@ -36,6 +36,16 @@ object FlinkUtils {
       case Array() => throw new IllegalArgumentException(s"[StreamX] can no found flink-dist jar in $flinkHome/lib")
       case array if array.length == 1 => s"$flinkHome/lib/${array.head}"
       case more => throw new IllegalArgumentException(s"[StreamX] found multiple flink-dist jar in ${flinkHome}/lib,[${more.mkString(",")}]")
+    }
+  }
+
+  def parseDynamicOptions(dynamicParams: String): Array[String] = {
+    if (StringUtils.isBlank(dynamicParams)) Array.empty[String] else {
+      dynamicParams
+        .replace("-D", "\u0001-D")
+        .split("\u0001")
+        .map(_.trim.replace("\"", ""))
+        .filter(!_.equals(""))
     }
   }
 
